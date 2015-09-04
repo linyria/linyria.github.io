@@ -1,0 +1,70 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Question 1</title>
+    <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script type="text/javascript">
+      function process(form)
+      {
+        var url = "https://api.github.com/search/users?q=" + form.users.value
+        $.ajax({
+          url: url
+        }).done(function(data) {
+          analyse_result(data.items)
+        });
+
+        return false;
+      }
+
+      function analyse_result(items)
+      {
+        var alphabet = "abcdefghijklmnopqrstuvwxyz";
+        var letters = {}
+        var output = "";
+        var char;
+
+        for (var i = 0; i < 26; ++i) {
+          char = alphabet.charAt(i);
+          letters[char] = 0;
+        }
+
+        letters["other"] = 0
+
+        // count first 5 logins
+        $.each(items, function(index, element) {
+          var username = element.login.toLowerCase();
+          var len = username.length;
+          output = output + "<br>" + username;
+
+          for (var i = 0; i < len; ++i) {
+            // Get this character
+            char = username.charAt(i);
+            if (alphabet.indexOf(char) > -1)
+              letters[char] = letters[char] + 1;
+            else
+              letters["other"] = letters["other"] + 1
+          }
+
+          if (index == 4) return false;
+        })
+
+        for (var i = 0; i < 26; ++i) {
+          char = alphabet.charAt(i);
+          output = output + "<br>" + char + " = " + letters[char];
+        }
+
+        output = output + "<br>other = " + letters["other"];
+
+        document.getElementById("output").innerHTML = output;
+      }
+    </script>
+  </head>
+  <body>
+    <form onsubmit="return process(this)">
+      <input type="text" name="users" value="">
+      <input type="submit" name="submit" value="submit">
+    </form>
+    <div id="output">
+    </div>
+  </body>
+</html>
